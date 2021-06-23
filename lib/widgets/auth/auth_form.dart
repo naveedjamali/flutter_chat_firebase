@@ -48,7 +48,7 @@ class _AuthFormState extends State<AuthForm> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  UserImagePicker(),
+                  if (!_isLogin) UserImagePicker(),
                   TextFormField(
                     key: ValueKey('userEmail'),
                     validator: (value) {
