@@ -44,15 +44,19 @@ class _AurhScreenState extends State<AuthScreen> {
             .child(authResult.user.uid + '.jpg');
 
         await ref.putFile(imageFile).then((snapshot) {
-          if(snapshot.state==TaskState.success){
+          if (snapshot.state == TaskState.success) {
+            ref.getDownloadURL().then((url) {
               FirebaseFirestore.instance
-            .collection('users')
-            .doc(authResult.user.uid)
-            .set({'username': username, 'email': email});
+                  .collection('users')
+                  .doc(authResult.user.uid)
+                  .set({
+                'username': username,
+                'email': email,
+                'image_url': url,
+              });
+            });
           }
         });
-
-      
       }
     } on PlatformException catch (err) {
       var message = 'An error occured, please check your credentials';
