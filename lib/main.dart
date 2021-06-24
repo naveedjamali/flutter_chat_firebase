@@ -1,11 +1,19 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_firebase/screens/auth_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_chat_firebase/screens/chat_screen.dart';
 
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage msg) async {
+  await Firebase.initializeApp();
+  print('Handling a background message');
+}
+
 void main() async {
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   /// Requires that a Firestore emulator is running locally.
   /// See https://firebase.flutter.dev/docs/firestore/usage#emulator-usage
   bool USE_FIRESTORE_EMULATOR = false;
@@ -15,11 +23,30 @@ void main() async {
   //   FirebaseFirestore.instance.settings = const Settings(
   //       host: 'localhost:8080', sslEnabled: false, persistenceEnabled: false);
   // }
+
+  FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+      alert: true, badge: true, sound: true);
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   // This widget is the root of your application.
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    FirebaseMessaging.instance.getInitialMessage().then((msg) {
+      if (msg != null) {
+        print('I am opening All messages screen');
+      }
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
