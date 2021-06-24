@@ -6,7 +6,7 @@ import 'package:flutter_chat_firebase/widgets/pickers/user_image_picker.dart';
 class AuthForm extends StatefulWidget {
   final bool isLoading;
   final void Function(String email, String password, String username,
-      bool isLogin, BuildContext ctx) submitFn;
+      File _imageFile, bool isLogin, BuildContext ctx) submitFn;
   AuthForm(this.submitFn, this.isLoading);
 
   @override
@@ -44,8 +44,14 @@ class _AuthFormState extends State<AuthForm> {
       _formKey.currentState.save();
 
       //Use those values to send our auth request...
-      widget.submitFn(_userEmail.trim(), _userPassword.trim(), _userName.trim(),
-          _isLogin, context);
+      widget.submitFn(
+        _userEmail.trim(),
+        _userPassword.trim(),
+        _userName.trim(),
+        _userImageFile,
+        _isLogin,
+        context,
+      );
     }
   }
 
@@ -116,12 +122,11 @@ class _AuthFormState extends State<AuthForm> {
                   ),
                   if (widget.isLoading) CircularProgressIndicator(),
                   if (!widget.isLoading)
-                    RaisedButton(
+                    ElevatedButton(
                       onPressed: _trySubmit,
                       child: Text(_isLogin ? 'Login' : 'Sign up'),
                     ),
-                  FlatButton(
-                    textColor: Theme.of(context).primaryColor,
+                  TextButton(
                     onPressed: () {
                       setState(() {
                         _isLogin = !_isLogin;

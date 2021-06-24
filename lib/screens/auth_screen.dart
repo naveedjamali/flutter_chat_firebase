@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../widgets/auth/auth_form.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class AuthScreen extends StatefulWidget {
   @override
@@ -18,6 +21,7 @@ class _AurhScreenState extends State<AuthScreen> {
     String email,
     String password,
     String username,
+    File imageFile,
     bool islogin,
     BuildContext ctx,
   ) async {
@@ -34,10 +38,21 @@ class _AurhScreenState extends State<AuthScreen> {
         authResult = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
 
-        await FirebaseFirestore.instance
+        final ref = FirebaseStorage.instance
+            .ref()
+            .child('user_image')
+            .child(authResult.user.uid + '.jpg');
+
+        await ref.putFile(imageFile).then((snapshot) {
+          if(snapshot.state==TaskState.success){
+              FirebaseFirestore.instance
             .collection('users')
             .doc(authResult.user.uid)
             .set({'username': username, 'email': email});
+          }
+        });
+
+      
       }
     } on PlatformException catch (err) {
       var message = 'An error occured, please check your credentials';
