@@ -5,6 +5,7 @@ import 'package:flutter_chat_firebase/screens/auth_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_chat_firebase/screens/chat_screen.dart';
+import 'package:flutter_chat_firebase/screens/splash_screen.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage msg) async {
   await Firebase.initializeApp();
@@ -67,6 +68,9 @@ class _MyAppState extends State<MyApp> {
       home: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (ctx, userSnapshot) {
+          if (userSnapshot.connectionState == ConnectionState.waiting) {
+            return SplashScreen();
+          }
           if (userSnapshot.hasData) {
             return ChatScreen();
           }
